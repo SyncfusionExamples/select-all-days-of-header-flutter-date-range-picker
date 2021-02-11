@@ -1,2 +1,1 @@
-# select-all-days-of-header-flutter-date-range-picker
-How to select all days when clicking on the day header in the Flutter date range picker (SfDateRangePicker)
+**[View document in Syncfusion Flutter Knowledge base](https://www.syncfusion.com/kb/12353/how-to-select-all-days-when-clicking-on-the-day-header-in-the-flutter-date-range-picker)**
