@@ -24,18 +24,10 @@ class HeaderCustomization extends StatefulWidget {
 
 class HeaderCustomizationState extends State<HeaderCustomization> {
   final List<String> _days = <String>['S', 'M', 'T', 'W', 'T', 'F', 'S'];
-  DateRangePickerController _controller;
-  String _headerString;
-  PickerDateRange _visibleDateRange;
-  int _selectedWeekDay;
-
-  @override
-  void initState() {
-    _controller = DateRangePickerController();
-    _headerString = '';
-    _selectedWeekDay = -1;
-    super.initState();
-  }
+  final DateRangePickerController _controller = DateRangePickerController();
+  String _headerString = '';
+  late PickerDateRange _visibleDateRange;
+  int _selectedWeekDay = -1;
 
   @override
   Widget build(BuildContext context) {
@@ -45,90 +37,89 @@ class HeaderCustomizationState extends State<HeaderCustomization> {
 
     return Scaffold(
         body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Container(
+            child: Row(
           children: <Widget>[
             Container(
-                child: Row(
-                  children: <Widget>[
-                    Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        width: viewHeaderCellWidth,
-                        child: IconButton(
-                          icon: Icon(Icons.arrow_left),
-                          color: Colors.black,
-                          onPressed: () {
-                            setState(() {
-                              _controller.backward();
-                            });
-                          },
-                        )),
-                    Expanded(
-                      child: Text(_headerString,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 25, color: Colors.black)),
-                    ),
-                    Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        width: viewHeaderCellWidth,
-                        child: IconButton(
-                          icon: Icon(Icons.arrow_right),
-                          color: Colors.black,
-                          onPressed: () {
-                            setState(() {
-                              _controller.forward();
-                            });
-                          },
-                        )),
-                  ],
-                )),
-            Container(
-                height: viewHeaderHeight,
-                width: width,
                 margin: const EdgeInsets.symmetric(horizontal: 4),
-                child: ListView.builder(
-                    itemCount: _days.length,
-                    scrollDirection: Axis.horizontal,
-                    itemBuilder: (BuildContext context, int index) {
-                      return GestureDetector(
-                          onTap: ()
-                          {
-                            final int selectedIndex = index == 0 ? 7 : index;
-                            _selectedWeekDay = selectedIndex;
-                            _updateSelectedDates();
-                          },
-                          child: Container(
-                            alignment: Alignment.center,
-                            width: viewHeaderCellWidth,
-                            height: viewHeaderHeight,
-                            child: Text(_days[index]),
-                          ));
-                    })),
+                width: viewHeaderCellWidth,
+                child: IconButton(
+                  icon: Icon(Icons.arrow_left),
+                  color: Colors.black,
+                  onPressed: () {
+                    setState(() {
+                      _controller.backward!();
+                    });
+                  },
+                )),
+            Expanded(
+              child: Text(_headerString,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 25, color: Colors.black)),
+            ),
             Container(
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              child: SfDateRangePicker(
-                selectionMode: DateRangePickerSelectionMode.multiple,
-                controller: _controller,
-                headerHeight: 0,
-                onViewChanged: viewChanged,
-                monthViewSettings:
-                DateRangePickerMonthViewSettings(viewHeaderHeight: 0),
-              ),
-            )
+                margin: const EdgeInsets.symmetric(horizontal: 4),
+                width: viewHeaderCellWidth,
+                child: IconButton(
+                  icon: Icon(Icons.arrow_right),
+                  color: Colors.black,
+                  onPressed: () {
+                    setState(() {
+                      _controller.forward!();
+                    });
+                  },
+                )),
           ],
-        ));
+        )),
+        Container(
+            height: viewHeaderHeight,
+            width: width,
+            margin: const EdgeInsets.symmetric(horizontal: 4),
+            child: ListView.builder(
+                itemCount: _days.length,
+                scrollDirection: Axis.horizontal,
+                itemBuilder: (BuildContext context, int index) {
+                  return GestureDetector(
+                      onTap: () {
+                        final int selectedIndex = index == 0 ? 7 : index;
+                        _selectedWeekDay = selectedIndex;
+                        _updateSelectedDates();
+                      },
+                      child: Container(
+                        alignment: Alignment.center,
+                        width: viewHeaderCellWidth,
+                        height: viewHeaderHeight,
+                        child: Text(_days[index]),
+                      ));
+                })),
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          child: SfDateRangePicker(
+            selectionMode: DateRangePickerSelectionMode.multiple,
+            controller: _controller,
+            headerHeight: 0,
+            onViewChanged: viewChanged,
+            monthViewSettings:
+                DateRangePickerMonthViewSettings(viewHeaderHeight: 0),
+          ),
+        )
+      ],
+    ));
   }
 
   void _updateSelectedDates() {
-    if (_selectedWeekDay == -1 || _visibleDateRange == null) {
+    if (_selectedWeekDay == -1) {
       return;
     }
 
     final List<DateTime> selectedDates = <DateTime>[];
-    DateTime date = _visibleDateRange.startDate;
-    while (date.isBefore(_visibleDateRange.endDate) ||
-        (date.year == _visibleDateRange.endDate.year &&
-            date.month == _visibleDateRange.endDate.month &&
-            date.day == _visibleDateRange.endDate.day)) {
+    DateTime date = _visibleDateRange.startDate!;
+    while (date.isBefore(_visibleDateRange.endDate!) ||
+        (date.year == _visibleDateRange.endDate!.year &&
+            date.month == _visibleDateRange.endDate!.month &&
+            date.day == _visibleDateRange.endDate!.day)) {
       if (_selectedWeekDay == date.weekday) {
         selectedDates.add(date);
       }
@@ -141,14 +132,13 @@ class HeaderCustomizationState extends State<HeaderCustomization> {
 
   void viewChanged(DateRangePickerViewChangedArgs args) {
     _visibleDateRange = args.visibleDateRange;
-    final int daysCount = (args.visibleDateRange.endDate
-        .difference(args.visibleDateRange.startDate)
+    final int daysCount = (args.visibleDateRange.endDate!
+        .difference(args.visibleDateRange.startDate!)
         .inDays);
-    var middleDate = (daysCount ~/ 2).toInt();
     final DateTime date =
-    args.visibleDateRange.startDate.add(Duration(days: middleDate));
+        args.visibleDateRange.startDate!.add(Duration(days: daysCount ~/ 2));
     _headerString = DateFormat('MMMM yyyy').format(date).toString();
-    SchedulerBinding.instance.addPostFrameCallback((duration) {
+    SchedulerBinding.instance!.addPostFrameCallback((duration) {
       setState(() {});
     });
   }
